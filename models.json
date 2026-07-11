@@ -1,0 +1,382 @@
+[
+  {
+    "id": "z-ai/glm-5.2",
+    "label": "GLM 5.2",
+    "group": "chat"
+  },
+  {
+    "id": "minimaxai/minimax-m3",
+    "label": "MiniMax M3",
+    "group": "chat"
+  },
+  {
+    "id": "google/diffusiongemma-26b-a4b-it",
+    "label": "DiffusionGemma 26B",
+    "group": "chat"
+  },
+  {
+    "id": "nvidia/nemotron-3-ultra-550b-a55b",
+    "label": "Nemotron 3 Ultra 550B",
+    "group": "chat"
+  },
+  {
+    "id": "nvidia/nemotron-3.5-content-safety",
+    "label": "Nemotron 3.5 Content Safety",
+    "group": "chat"
+  },
+  {
+    "id": "stepfun-ai/step-3.7-flash",
+    "label": "Step 3.7 Flash",
+    "group": "chat"
+  },
+  {
+    "id": "mistralai/mistral-medium-3.5-128b",
+    "label": "Mistral Medium 3.5",
+    "group": "chat"
+  },
+  {
+    "id": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning",
+    "label": "Nemotron 3 Nano Omni",
+    "group": "chat"
+  },
+  {
+    "id": "deepseek-ai/deepseek-v4-flash",
+    "label": "DeepSeek V4 Flash",
+    "group": "chat"
+  },
+  {
+    "id": "deepseek-ai/deepseek-v4-pro",
+    "label": "DeepSeek V4 Pro",
+    "group": "chat"
+  },
+  {
+    "id": "nvidia/nemotron-3-content-safety",
+    "label": "Nemotron 3 Content Safety",
+    "group": "chat"
+  },
+  {
+    "id": "nvidia/ai-synthetic-video-detector",
+    "label": "AI Synthetic Video Detector",
+    "group": "chat"
+  },
+  {
+    "id": "nvidia/ising-calibration-1-35b-a3b",
+    "label": "Ising Calibration 1",
+    "group": "chat"
+  },
+  {
+    "id": "minimaxai/minimax-m2.7",
+    "label": "MiniMax M2.7",
+    "group": "chat"
+  },
+  {
+    "id": "google/gemma-4-31b-it",
+    "label": "Gemma 4 31B",
+    "group": "chat"
+  },
+  {
+    "id": "mistralai/mistral-small-4-119b-2603",
+    "label": "Mistral Small 4",
+    "group": "chat"
+  },
+  {
+    "id": "nvidia/nemotron-3-super-120b-a12b",
+    "label": "Nemotron 3 Super 120B",
+    "group": "chat"
+  },
+  {
+    "id": "qwen/qwen3.5-122b-a10b",
+    "label": "Qwen 3.5 122B",
+    "group": "chat"
+  },
+  {
+    "id": "nvidia/gliner-pii",
+    "label": "GLiNER PII",
+    "group": "chat"
+  },
+  {
+    "id": "qwen/qwen3.5-397b-a17b",
+    "label": "Qwen 3.5 397B",
+    "group": "chat"
+  },
+  {
+    "id": "stepfun-ai/step-3.5-flash",
+    "label": "Step 3.5 Flash",
+    "group": "chat"
+  },
+  {
+    "id": "nvidia/nemotron-content-safety-reasoning-4b",
+    "label": "Nemotron Content Safety 4B",
+    "group": "chat"
+  },
+  {
+    "id": "nvidia/nemotron-3-nano-30b-a3b",
+    "label": "Nemotron 3 Nano 30B",
+    "group": "chat"
+  },
+  {
+    "id": "nvidia/riva-translate-4b-instruct-v1.1",
+    "label": "Riva Translate 4B",
+    "group": "chat"
+  },
+  {
+    "id": "mistralai/mistral-large-3-675b-instruct-2512",
+    "label": "Mistral Large 3 675B",
+    "group": "chat"
+  },
+  {
+    "id": "mistralai/ministral-14b-instruct-2512",
+    "label": "Ministral 14B",
+    "group": "chat"
+  },
+  {
+    "id": "nvidia/nemotron-nano-12b-v2-vl",
+    "label": "Nemotron Nano 12B VL",
+    "group": "chat"
+  },
+  {
+    "id": "nvidia/llama-3.1-nemotron-safety-guard-8b-v3",
+    "label": "Nemotron Safety Guard 8B",
+    "group": "chat"
+  },
+  {
+    "id": "stockmark/stockmark-2-100b-instruct",
+    "label": "Stockmark 2 100B",
+    "group": "chat"
+  },
+  {
+    "id": "qwen/qwen3-next-80b-a3b-instruct",
+    "label": "Qwen3 Next 80B",
+    "group": "chat"
+  },
+  {
+    "id": "bytedance/seed-oss-36b-instruct",
+    "label": "Seed OSS 36B",
+    "group": "chat"
+  },
+  {
+    "id": "nvidia/nvidia-nemotron-nano-9b-v2",
+    "label": "Nemotron Nano 9B v2",
+    "group": "chat"
+  },
+  {
+    "id": "openai/gpt-oss-20b",
+    "label": "GPT-OSS 20B",
+    "group": "chat"
+  },
+  {
+    "id": "openai/gpt-oss-120b",
+    "label": "GPT-OSS 120B",
+    "group": "chat"
+  },
+  {
+    "id": "nvidia/llama-3.3-nemotron-super-49b-v1.5",
+    "label": "Nemotron Super 49B v1.5",
+    "group": "chat"
+  },
+  {
+    "id": "sarvamai/sarvam-m",
+    "label": "Sarvam M",
+    "group": "chat"
+  },
+  {
+    "id": "meta/llama-guard-4-12b",
+    "label": "Llama Guard 4",
+    "group": "chat"
+  },
+  {
+    "id": "google/gemma-3n-e4b-it",
+    "label": "Gemma 3n E4B",
+    "group": "chat"
+  },
+  {
+    "id": "google/gemma-3n-e2b-it",
+    "label": "Gemma 3n E2B",
+    "group": "chat"
+  },
+  {
+    "id": "mistralai/mistral-nemotron",
+    "label": "Mistral Nemotron",
+    "group": "chat"
+  },
+  {
+    "id": "nvidia/llama-3.1-nemotron-nano-vl-8b-v1",
+    "label": "Nemotron Nano VL 8B",
+    "group": "chat"
+  },
+  {
+    "id": "meta/llama-4-maverick-17b-128e-instruct",
+    "label": "Llama 4 Maverick",
+    "group": "chat"
+  },
+  {
+    "id": "nvidia/llama-3.3-nemotron-super-49b-v1",
+    "label": "Nemotron Super 49B v1",
+    "group": "chat"
+  },
+  {
+    "id": "nvidia/llama-3.1-nemotron-nano-8b-v1",
+    "label": "Nemotron Nano 8B v1",
+    "group": "chat"
+  },
+  {
+    "id": "nvidia/nv-embedcode-7b-v1",
+    "label": "NV-EmbedCode 7B",
+    "group": "chat"
+  },
+  {
+    "id": "microsoft/phi-4-mini-instruct",
+    "label": "Phi-4 Mini",
+    "group": "chat"
+  },
+  {
+    "id": "microsoft/phi-4-multimodal-instruct",
+    "label": "Phi-4 Multimodal",
+    "group": "chat"
+  },
+  {
+    "id": "meta/llama-3.3-70b-instruct",
+    "label": "Llama 3.3 70B",
+    "group": "chat"
+  },
+  {
+    "id": "meta/llama-3.2-3b-instruct",
+    "label": "Llama 3.2 3B",
+    "group": "chat"
+  },
+  {
+    "id": "meta/llama-3.2-11b-vision-instruct",
+    "label": "Llama 3.2 11B Vision",
+    "group": "chat"
+  },
+  {
+    "id": "meta/llama-3.2-90b-vision-instruct",
+    "label": "Llama 3.2 90B Vision",
+    "group": "chat"
+  },
+  {
+    "id": "meta/llama-3.2-1b-instruct",
+    "label": "Llama 3.2 1B",
+    "group": "chat"
+  },
+  {
+    "id": "abacusai/dracarys-llama-3.1-70b-instruct",
+    "label": "Dracarys Llama 3.1 70B",
+    "group": "chat"
+  },
+  {
+    "id": "nvidia/nemotron-mini-4b-instruct",
+    "label": "Nemotron Mini 4B",
+    "group": "chat"
+  },
+  {
+    "id": "google/gemma-2-2b-it",
+    "label": "Gemma 2 2B",
+    "group": "chat"
+  },
+  {
+    "id": "meta/llama-3.1-70b-instruct",
+    "label": "Llama 3.1 70B",
+    "group": "chat"
+  },
+  {
+    "id": "meta/llama-3.1-8b-instruct",
+    "label": "Llama 3.1 8B",
+    "group": "chat"
+  },
+  {
+    "id": "nvidia/nv-embed-v1",
+    "label": "NV-Embed v1",
+    "group": "chat"
+  },
+  {
+    "id": "upstage/solar-10.7b-instruct",
+    "label": "Solar 10.7B",
+    "group": "chat"
+  },
+  {
+    "id": "mistralai/mixtral-8x7b-instruct-v0.1",
+    "label": "Mixtral 8x7B",
+    "group": "chat"
+  },
+  {
+    "id": "cosmos3-nano",
+    "label": "Cosmos3 Nano",
+    "group": "video"
+  },
+  {
+    "id": "cosmos3-nano-reasoner",
+    "label": "Cosmos3 Nano Reasoner",
+    "group": "video"
+  },
+  {
+    "id": "cosmos-transfer2.5-2b",
+    "label": "Cosmos Transfer 2.5 2B",
+    "group": "video"
+  },
+  {
+    "id": "cosmos-transfer1-7b",
+    "label": "Cosmos Transfer 1 7B",
+    "group": "video"
+  },
+  {
+    "id": "paligemma",
+    "label": "PaliGemma",
+    "group": "vision"
+  },
+  {
+    "id": "nemotron-voicechat",
+    "label": "Nemotron Voice Chat",
+    "group": "audio"
+  },
+  {
+    "id": "Active Speaker Detection",
+    "label": "Active Speaker Detection",
+    "group": "audio"
+  },
+  {
+    "id": "Background Noise Removal",
+    "label": "Background Noise Removal",
+    "group": "audio"
+  },
+  {
+    "id": "Studio Voice",
+    "label": "Studio Voice",
+    "group": "audio"
+  },
+  {
+    "id": "magpie-tts-zeroshot",
+    "label": "Magpie TTS ZeroShot",
+    "group": "audio"
+  },
+  {
+    "id": "esm2-650m",
+    "label": "ESM2 650M",
+    "group": "biology"
+  },
+  {
+    "id": "esmfold",
+    "label": "ESMFold",
+    "group": "biology"
+  },
+  {
+    "id": "streampetr",
+    "label": "StreamPETR",
+    "group": "driving"
+  },
+  {
+    "id": "sparsedrive",
+    "label": "SparseDrive",
+    "group": "driving"
+  },
+  {
+    "id": "bevformer",
+    "label": "BEVFormer",
+    "group": "driving"
+  },
+  {
+    "id": "rerank-qa-mistral-4b",
+    "label": "Rerank QA Mistral 4B",
+    "group": "rerank"
+  }
+]

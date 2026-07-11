@@ -1,0 +1,6 @@
+.env
+Testing-NIM/
+node_modules/
+dist/
+__pycache__/
+*.pyc
