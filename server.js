@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import runBenchmark, { benchmarkModel } from './benchmark.js';
 import OpenAI from 'openai';
+import cors from 'cors';
 import 'dotenv/config';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -12,6 +13,7 @@ const __dirname = dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.use(cors());
 app.use(express.static(join(__dirname, 'dist')));
 app.use(express.json());
 

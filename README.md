@@ -45,6 +45,25 @@ npm start
 
 Builds the React app into `dist/` and serves everything from Express on port 3000.
 
+## Deploy to Render
+
+One-click deployment for the full stack (frontend + backend):
+
+1. Push this repo to GitHub
+2. Go to [dashboard.render.com](https://dashboard.render.com) → **New Web Service**
+3. Connect your repository
+4. Use these settings:
+
+   | Setting          | Value                                |
+   |------------------|--------------------------------------|
+   | Build Command    | `npm install && npm run build`        |
+   | Start Command    | `node server.js`                     |
+   | Env Variable     | `NVIDIA_API_KEY` = your NVIDIA key   |
+
+5. Click **Deploy**
+
+Your app will be live at `https://your-app-name.onrender.com` — frontend and API on the same domain, no CORS or proxy configuration needed.
+
 ## Project Structure
 
 ```
@@ -88,7 +107,9 @@ Builds the React app into `dist/` and serves everything from Express on port 300
 | API Client  | OpenAI SDK (compatible with NVIDIA)  |
 | Dev Tooling | concurrently (Vite + Express)        |
 
-The frontend is a single-page application. The backend exposes:
+In development, Vite proxies `/api/*`, `/results.json`, and `/models.json` to the Express server. In production, the Express server serves both the built frontend and the API.
+
+The backend exposes:
 - **`GET /api/benchmark`** — SSE endpoint to start/resume/restart a benchmark
 - **`GET /api/benchmark/retry`** — SSE endpoint to retry a single model
 - **`GET /models.json`** — Model definitions
@@ -102,6 +123,7 @@ The frontend is a single-page application. The backend exposes:
 | `npm run dev`    | Vite dev server + Express concurrently         |
 | `npm run build`  | Build React app to `dist/`                     |
 | `npm start`      | Build + serve from Express on port 3000        |
+| `node server.js` | Serve production build (without rebuild)       |
 
 ## Tech Stack
 
@@ -110,6 +132,7 @@ The frontend is a single-page application. The backend exposes:
 - **Express 4** — HTTP server and SSE streaming
 - **OpenAI SDK** — API client for NVIDIA NIM endpoint
 - **dotenv** — environment variable loading
+- **cors** — cross-origin support for API access
 
 ## Models
 
