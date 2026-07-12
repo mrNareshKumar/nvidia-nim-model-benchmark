@@ -1,5 +1,5 @@
 import express from 'express';
-import { existsSync, readFileSync, writeFileSync, renameSync, statSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync, renameSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import runBenchmark from './benchmark.js';
@@ -20,14 +20,17 @@ let activeBenchmark = null;
 app.use(express.static(join(__dirname, 'dist')));
 app.use(express.json());
 
-async function persistResults() {
+async function persistResults(snapshot) {
+  const data = snapshot ?? resultsCache;
   try {
     const tmp = RESULTS_FILE + '.tmp.' + Date.now();
-    writeFileSync(tmp, JSON.stringify(resultsCache, null, 2), 'utf-8');
+    writeFileSync(tmp, JSON.stringify(data, null, 2), 'utf-8');
     renameSync(tmp, RESULTS_FILE);
-  } catch {}
+  } catch (err) {
+    console.error('File write failed:', err.message);
+  }
   if (db.dbAvailable) {
-    try { await db.replaceAll(resultsCache); } catch (err) { console.error('DB replaceAll failed:', err.message); }
+    try { await db.replaceAll(data); } catch (err) { console.error('DB replaceAll failed:', err.message); }
   }
 }
 
@@ -58,7 +61,7 @@ app.get('/api/benchmark', (req, res) => {
   if (restart) {
     resultsCache = [];
     resultsMtime = new Date();
-    persistResults();
+    persistResults([]);
   }
 
   const onEvent = (evt) => {
@@ -78,7 +81,8 @@ app.get('/api/benchmark', (req, res) => {
 
     send(evt);
     if (evt.type === 'done') {
-      persistResults();
+      const snapshot = [...resultsCache];
+      persistResults(snapshot);
       aborted = true;
       res.end();
     }
@@ -148,11 +152,20 @@ app.post('/api/results/delete', (req, res) => {
     resultsCache = resultsCache.filter(r => !modelIds.includes(r.id));
     const deleted = before - resultsCache.length;
     resultsMtime = new Date();
-    persistResults();
+    const snapshot = [...resultsCache];
+    persistResults(snapshot);
     res.json({ deleted, remaining: resultsCache.length });
   } catch {
     res.status(500).json({ error: 'Failed to update results' });
   }
+});
+
+app.get('/api/health', (req, res) => {
+  res.json({
+    db: db.dbAvailable ? 'postgresql' : 'file',
+    cacheSize: resultsCache?.length ?? 0,
+    uptime: process.uptime(),
+  });
 });
 
 app.get('*', (req, res) => {
@@ -163,11 +176,29 @@ async function start() {
   await db.initDB();
 
   if (db.dbAvailable) {
-    try { resultsCache = await db.loadResults(); } catch {}
+    try {
+      const loaded = await db.loadResults();
+      if (loaded) resultsCache = loaded;
+    } catch (err) {
+      console.error('Failed to load results from DB:', err.message);
+    }
   }
 
-  if (!resultsCache && existsSync(RESULTS_FILE)) {
-    try { resultsCache = JSON.parse(readFileSync(RESULTS_FILE, 'utf-8')); } catch {}
+  // Fall back to file if DB is unavailable or returned empty
+  if ((!resultsCache || resultsCache.length === 0) && existsSync(RESULTS_FILE)) {
+    try {
+      const fileData = JSON.parse(readFileSync(RESULTS_FILE, 'utf-8'));
+      if (Array.isArray(fileData) && fileData.length > 0) {
+        resultsCache = fileData;
+        console.log(`Loaded ${resultsCache.length} results from file`);
+        // Sync file data to DB for next restart
+        if (db.dbAvailable) {
+          persistResults(resultsCache);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load results from file:', err.message);
+    }
   }
 
   if (!resultsCache) resultsCache = [];
@@ -176,6 +207,7 @@ async function start() {
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
     console.log(`Storage: ${db.dbAvailable ? 'PostgreSQL' : 'File-based'}`);
+    console.log(`Results in cache: ${resultsCache.length}`);
   });
 }
 
