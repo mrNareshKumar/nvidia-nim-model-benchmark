@@ -26,6 +26,7 @@ async function persistResults(snapshot) {
     const tmp = RESULTS_FILE + '.tmp.' + Date.now();
     writeFileSync(tmp, JSON.stringify(data, null, 2), 'utf-8');
     renameSync(tmp, RESULTS_FILE);
+    console.log(`File saved: ${data.length} results`);
   } catch (err) {
     console.error('File write failed:', err.message);
   }
@@ -59,6 +60,7 @@ app.get('/api/benchmark', (req, res) => {
   const restart = req.query.restart === '1';
 
   if (restart) {
+    console.log('Benchmark restart requested — clearing cache and DB');
     resultsCache = [];
     resultsMtime = new Date();
     persistResults([]);
@@ -81,6 +83,7 @@ app.get('/api/benchmark', (req, res) => {
 
     send(evt);
     if (evt.type === 'done') {
+      console.log('Benchmark done — persisting results');
       const snapshot = [...resultsCache];
       persistResults(snapshot);
       aborted = true;
@@ -160,10 +163,13 @@ app.post('/api/results/delete', (req, res) => {
   }
 });
 
-app.get('/api/health', (req, res) => {
+app.get('/api/health', async (req, res) => {
+  const dbCount = db.dbAvailable ? await db.countResults() : -1;
   res.json({
     db: db.dbAvailable ? 'postgresql' : 'file',
+    dbUrlSet: !!process.env.DATABASE_URL,
     cacheSize: resultsCache?.length ?? 0,
+    dbRowCount: dbCount,
     uptime: process.uptime(),
   });
 });
@@ -173,26 +179,36 @@ app.get('*', (req, res) => {
 });
 
 async function start() {
+  const dbUrlSet = !!process.env.DATABASE_URL;
+  console.log(`Server starting... DATABASE_URL is ${dbUrlSet ? 'SET' : 'NOT SET'}`);
+
   await db.initDB();
 
+  let source = 'empty';
   if (db.dbAvailable) {
     try {
       const loaded = await db.loadResults();
-      if (loaded) resultsCache = loaded;
+      if (loaded && loaded.length > 0) {
+        resultsCache = loaded;
+        source = `DB (${loaded.length} results)`;
+      } else {
+        source = 'DB empty';
+      }
     } catch (err) {
       console.error('Failed to load results from DB:', err.message);
+      source = 'DB error';
     }
   }
 
-  // Fall back to file if DB is unavailable or returned empty
   if ((!resultsCache || resultsCache.length === 0) && existsSync(RESULTS_FILE)) {
     try {
       const fileData = JSON.parse(readFileSync(RESULTS_FILE, 'utf-8'));
       if (Array.isArray(fileData) && fileData.length > 0) {
         resultsCache = fileData;
+        source = `file (${fileData.length} results)`;
         console.log(`Loaded ${resultsCache.length} results from file`);
-        // Sync file data to DB for next restart
         if (db.dbAvailable) {
+          console.log('Syncing file data to PostgreSQL...');
           persistResults(resultsCache);
         }
       }
@@ -207,6 +223,7 @@ async function start() {
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
     console.log(`Storage: ${db.dbAvailable ? 'PostgreSQL' : 'File-based'}`);
+    console.log(`Results loaded from: ${source}`);
     console.log(`Results in cache: ${resultsCache.length}`);
   });
 }
