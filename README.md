@@ -14,6 +14,7 @@ A full-stack web application that benchmarks Large Language Models (LLMs) served
 - **CSV export** and **print-friendly** styles
 - **Dark/light theme** persisted to localStorage
 - **All JavaScript** — no Python or external services required
+- **Persistent storage** — optional PostgreSQL (results survive server restarts, redeploys, and Render sleep cycles)
 
 ## Setup
 
@@ -59,8 +60,20 @@ One-click deployment for the full stack (frontend + backend):
    | Build Command    | `npm install && npm run build`        |
    | Start Command    | `node server.js`                     |
    | Env Variable     | `NVIDIA_API_KEY` = your NVIDIA key   |
+   | Env Variable     | `DATABASE_URL` = your Render Postgres URL _(optional)_ |
 
 5. Click **Deploy**
+
+### Persistent storage (optional)
+
+Results are stored in a local `results.json` by default, which is **ephemeral** on Render's free tier — data is lost when the service spins down.
+
+To persist results across restarts and sleep cycles:
+
+1. Go to **Render Dashboard** → **New PostgreSQL** (free tier, 1 GB)
+2. After creation, copy the **Internal Database URL**
+3. Add `DATABASE_URL` to your Web Service's environment variables
+4. Redeploy
 
 Your app will be live at `https://your-app-name.onrender.com` — frontend and API on the same domain, no CORS or proxy configuration needed.
 
@@ -91,6 +104,7 @@ Your app will be live at `https://your-app-name.onrender.com` — frontend and A
     │   ├── Legend.jsx
     │   ├── ParticleBackground.jsx
     │   └── RunBenchmark.jsx
+    ├── db.js               # PostgreSQL client & CRUD (optional, falls back to file)
     ├── hooks/
     │   └── useAnimatedCounter.js
     └── utils/
@@ -104,15 +118,18 @@ Your app will be live at `https://your-app-name.onrender.com` — frontend and A
 |-------------|--------------------------------------|
 | Frontend    | React 18 + Vite 6 (pure CSS)         |
 | Backend     | Node.js (ESM) + Express 4            |
+| Database    | PostgreSQL via `pg` (optional, file fallback) |
 | API Client  | OpenAI SDK (compatible with NVIDIA)  |
 | Dev Tooling | concurrently (Vite + Express)        |
 
 In development, Vite proxies `/api/*`, `/results.json`, and `/models.json` to the Express server. In production, the Express server serves both the built frontend and the API.
 
+Results are kept in an in-memory cache for instant reads. On each benchmark result, the cache is updated and asynchronously persisted to PostgreSQL (if `DATABASE_URL` is set) or to `results.json` as a file fallback.
+
 The backend exposes:
 - **`GET /api/benchmark`** — SSE endpoint to start/resume/restart a benchmark
 - **`GET /models.json`** — Model definitions
-- **`GET /results.json`** — Cached results with `Last-Modified` timestamp
+- **`GET /results.json`** — Results served from in-memory cache with `Last-Modified` timestamp
 - **`POST /api/results/delete`** — Delete results by model ID array
 
 ## Scripts
@@ -130,6 +147,7 @@ The backend exposes:
 - **Vite 6** — fast dev server with HMR
 - **Express 4** — HTTP server and SSE streaming
 - **OpenAI SDK** — API client for NVIDIA NIM endpoint
+- **PostgreSQL + pg** — optional persistent storage (falls back to file-based `results.json`)
 - **dotenv** — environment variable loading
 
 ## Models
