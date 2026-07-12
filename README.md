@@ -1,4 +1,4 @@
-# Live Demo : <a href="https://mrnareshkumar.github.io/nvidia-nim-model-benchmark/"> NVIDIA NIM — LLM Speed Benchmark</a>  
+# Live Demo : <a href="https://nvidia-nim-model-benchmark.onrender.com"> NVIDIA NIM — LLM Speed Benchmark</a>  
 
 A full-stack web application that benchmarks Large Language Models (LLMs) served through NVIDIA's [NIM](https://www.nvidia.com/en-us/ai/) (NVIDIA Inference Microservices) platform. Runs a unified prompt against 76 models across 7 categories and visualizes results with an interactive React dashboard.
 
