@@ -111,7 +111,6 @@ In development, Vite proxies `/api/*`, `/results.json`, and `/models.json` to th
 
 The backend exposes:
 - **`GET /api/benchmark`** — SSE endpoint to start/resume/restart a benchmark
-- **`GET /api/benchmark/retry`** — SSE endpoint to retry a single model
 - **`GET /models.json`** — Model definitions
 - **`GET /results.json`** — Cached results with `Last-Modified` timestamp
 - **`POST /api/results/delete`** — Delete results by model ID array
@@ -132,7 +131,6 @@ The backend exposes:
 - **Express 4** — HTTP server and SSE streaming
 - **OpenAI SDK** — API client for NVIDIA NIM endpoint
 - **dotenv** — environment variable loading
-- **cors** — cross-origin support for API access
 
 ## Models
 
