@@ -3,6 +3,7 @@ import { existsSync, readFileSync, writeFileSync, renameSync, statSync } from 'f
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import runBenchmark from './benchmark.js';
+import * as db from './src/db.js';
 import 'dotenv/config';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -10,11 +11,25 @@ const __dirname = dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const RESULTS_FILE = join(__dirname, 'results.json');
+
+let resultsCache = null;
+let resultsMtime = null;
+let activeBenchmark = null;
 
 app.use(express.static(join(__dirname, 'dist')));
 app.use(express.json());
 
-let activeBenchmark = null;
+async function persistResults() {
+  try {
+    const tmp = RESULTS_FILE + '.tmp.' + Date.now();
+    writeFileSync(tmp, JSON.stringify(resultsCache, null, 2), 'utf-8');
+    renameSync(tmp, RESULTS_FILE);
+  } catch {}
+  if (db.dbAvailable) {
+    try { await db.replaceAll(resultsCache); } catch (err) { console.error('DB replaceAll failed:', err.message); }
+  }
+}
 
 app.get('/api/benchmark', (req, res) => {
   if (activeBenchmark) {
@@ -38,10 +53,32 @@ app.get('/api/benchmark', (req, res) => {
   const abortController = new AbortController();
   activeBenchmark = abortController;
 
+  const restart = req.query.restart === '1';
+
+  if (restart) {
+    resultsCache = [];
+    resultsMtime = new Date();
+    persistResults();
+  }
+
   const onEvent = (evt) => {
     if (aborted) return;
+
+    if (evt.type === 'result') {
+      const entry = { ...evt };
+      delete entry.type;
+      const idx = resultsCache.findIndex(r => r.id === entry.id);
+      if (idx >= 0) resultsCache[idx] = entry;
+      else resultsCache.push(entry);
+      resultsMtime = new Date();
+      if (db.dbAvailable) {
+        db.upsertResult(entry).catch(err => console.error('DB upsert failed:', err.message));
+      }
+    }
+
     send(evt);
     if (evt.type === 'done') {
+      persistResults();
       aborted = true;
       res.end();
     }
@@ -55,7 +92,6 @@ app.get('/api/benchmark', (req, res) => {
 
   req.on('close', abortListener);
 
-  const restart = req.query.restart === '1';
   const prompt = req.query.prompt || undefined;
   const modelIds = req.query.models ? req.query.models.split(',') : undefined;
   const rerunModels = req.query.rerun ? req.query.rerun.split(',') : undefined;
@@ -92,17 +128,13 @@ app.get('/models.json', (req, res) => {
 });
 
 app.get('/results.json', (req, res) => {
-  const file = join(__dirname, 'results.json');
-  if (!existsSync(file)) return res.status(404).json({ error: 'results.json not found' });
+  if (!resultsCache) return res.status(404).json({ error: 'No results available' });
   try {
-    const raw = readFileSync(file, 'utf-8');
-    JSON.parse(raw);
-    const mtime = statSync(file).mtime;
-    res.set('Last-Modified', mtime.toUTCString());
+    res.set('Last-Modified', resultsMtime ? resultsMtime.toUTCString() : new Date().toUTCString());
     res.set('Cache-Control', 'no-store, no-cache, must-revalidate');
-    res.type('json').send(raw);
+    res.type('json').send(JSON.stringify(resultsCache));
   } catch {
-    res.status(500).json({ error: 'results.json is corrupted. Run benchmark with --restart to reset.' });
+    res.status(500).json({ error: 'Results cache corrupted' });
   }
 });
 
@@ -111,19 +143,15 @@ app.post('/api/results/delete', (req, res) => {
   if (!modelIds || !Array.isArray(modelIds) || modelIds.length === 0) {
     return res.status(400).json({ error: 'modelIds array required' });
   }
-  const file = join(__dirname, 'results.json');
-  if (!existsSync(file)) return res.status(404).json({ error: 'results.json not found' });
   try {
-    let results = JSON.parse(readFileSync(file, 'utf-8'));
-    const before = results.length;
-    results = results.filter(r => !modelIds.includes(r.id));
-    const deleted = before - results.length;
-    const tmp = file + '.tmp.' + Date.now();
-    writeFileSync(tmp, JSON.stringify(results, null, 2), 'utf-8');
-    renameSync(tmp, file);
-    res.json({ deleted, remaining: results.length });
+    const before = resultsCache.length;
+    resultsCache = resultsCache.filter(r => !modelIds.includes(r.id));
+    const deleted = before - resultsCache.length;
+    resultsMtime = new Date();
+    persistResults();
+    res.json({ deleted, remaining: resultsCache.length });
   } catch {
-    res.status(500).json({ error: 'Failed to update results.json' });
+    res.status(500).json({ error: 'Failed to update results' });
   }
 });
 
@@ -131,6 +159,24 @@ app.get('*', (req, res) => {
   res.sendFile(join(__dirname, 'dist', 'index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+async function start() {
+  await db.initDB();
+
+  if (db.dbAvailable) {
+    try { resultsCache = await db.loadResults(); } catch {}
+  }
+
+  if (!resultsCache && existsSync(RESULTS_FILE)) {
+    try { resultsCache = JSON.parse(readFileSync(RESULTS_FILE, 'utf-8')); } catch {}
+  }
+
+  if (!resultsCache) resultsCache = [];
+  resultsMtime = new Date();
+
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Storage: ${db.dbAvailable ? 'PostgreSQL' : 'File-based'}`);
+  });
+}
+
+start();
