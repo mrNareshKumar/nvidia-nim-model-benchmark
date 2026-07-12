@@ -216,21 +216,6 @@ const RunBenchmark = forwardRef(function RunBenchmark({ onComplete, onVisibleCha
     }
   }, [onComplete, onVisibleChange, customPrompt, getSelected, allModels.length, apiBaseUrl, apiKey]);
 
-  function retryCategory(status) {
-    const modelIds = results
-      .filter(r => {
-        if (status === 'ok') return r.status === 'ok';
-        const isTimeout = r.error?.toLowerCase().includes('timeout');
-        if (status === 'timeout') return isTimeout;
-        if (status === 'error') return r.status !== 'ok' && !isTimeout;
-        return false;
-      })
-      .map(r => r.id);
-    if (modelIds.length === 0) return;
-    setResults(prev => prev.filter(r => !modelIds.includes(r.id)));
-    connect(false, modelIds);
-  }
-
   useImperativeHandle(ref, () => ({
     start() {
       if (getSelected().length === 0) { setError('Select at least one model to test'); return; }

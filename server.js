@@ -2,9 +2,7 @@ import express from 'express';
 import { existsSync, readFileSync, writeFileSync, renameSync, statSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import runBenchmark, { benchmarkModel } from './benchmark.js';
-import OpenAI from 'openai';
-import cors from 'cors';
+import runBenchmark from './benchmark.js';
 import 'dotenv/config';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -13,7 +11,6 @@ const __dirname = dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
 app.use(express.static(join(__dirname, 'dist')));
 app.use(express.json());
 
@@ -85,66 +82,6 @@ app.get('/api/benchmark', (req, res) => {
     .finally(() => {
       if (activeBenchmark === abortController) activeBenchmark = null;
     });
-});
-
-app.get('/api/benchmark/retry', async (req, res) => {
-  const modelId = req.query.modelId;
-  const label = req.query.label;
-  if (!modelId) return res.status(400).json({ error: 'modelId required' });
-
-  res.writeHead(200, {
-    'Content-Type': 'text/event-stream',
-    'Cache-Control': 'no-cache',
-    Connection: 'keep-alive',
-  });
-
-  let aborted = false;
-  const send = (data) => {
-    if (!aborted) res.write(`data: ${JSON.stringify(data)}\n\n`);
-  };
-
-  req.on('close', () => { aborted = true; });
-
-  try {
-    send({ type: 'connected' });
-
-    const apiKey = process.env.NVIDIA_API_KEY;
-    if (!apiKey) {
-      send({ type: 'error', text: 'NVIDIA_API_KEY is not set.' });
-      send({ type: 'done' });
-      return res.end();
-    }
-
-    const baseURL = process.env.API_BASE_URL || 'https://integrate.api.nvidia.com/v1';
-    const client = new OpenAI({ baseURL, apiKey, timeout: 15000 });
-
-    const timeoutSec = parseInt(req.query.timeout) || 30;
-    const prompt = req.query.prompt || undefined;
-
-    send({ type: 'init', total: 1, existing: 0, toRun: 1 });
-
-    const result = await benchmarkModel(client, modelId, label || modelId, timeoutSec, prompt || 'What is the capital of India? Please answer in one sentence.', (progress) => {
-      if (!aborted) send({ type: 'progress', modelId, label, index: 1, total: 1, ...progress });
-    });
-
-    if (!aborted && result) {
-      send({ type: 'result', ...result });
-      send({
-        type: 'summary',
-        total: 1,
-        succeeded: result.status === 'ok' ? 1 : 0,
-        timeouts: result.status !== 'ok' && result.error?.toLowerCase().includes('timeout') ? 1 : 0,
-        errors: result.status !== 'ok' && !result.error?.toLowerCase().includes('timeout') ? 1 : 0,
-        elapsed: result.total_time_s || 0,
-      });
-    }
-    send({ type: 'done' });
-    res.end();
-  } catch (err) {
-    if (!aborted) send({ type: 'error', text: err.message });
-    send({ type: 'done' });
-    res.end();
-  }
 });
 
 app.get('/models.json', (req, res) => {

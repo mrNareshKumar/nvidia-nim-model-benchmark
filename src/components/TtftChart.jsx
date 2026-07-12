@@ -39,7 +39,7 @@ export default function TtftChart({ sortedOk }) {
               <div className="rank" />
               <span className="status-icon">⚡</span>
               <div className="model-name" title={tooltip}>
-                <ProviderIcon provider={provider} size={12} color={color} />
+                <ProviderIcon provider={provider} size={12} />
                 {d.label}
               </div>
               <div className="bar-ttft" />

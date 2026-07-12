@@ -80,7 +80,7 @@ export default function MainChart({
         <div className="rank">{isOk ? index + 1 : ''}</div>
         <span className="status-icon">{emoji}</span>
         <div className="model-name" title={tooltip}>
-              <ProviderIcon provider={provider} size={12} color={color} />
+              <ProviderIcon provider={provider} size={12} />
           {d.label}
         </div>
         <div className="bar-ttft">{isOk && d.ttft_s ? `${d.ttft_s.toFixed(2)}s` : ''}</div>

@@ -218,12 +218,6 @@ const OpenAIIcon = memo(({ size = 12 }) => (
   </svg>
 ));
 
-const ZAIIcon = memo(({ size = 12 }) => (
-  <svg viewBox="0 0 24 24" width={size} height={size} style={{ flex: 'none', lineHeight: 1 }}>
-    <path d="M12.105 2L9.927 4.953H.653L2.83 2h9.276zM23.254 19.048L21.078 22h-9.242l2.174-2.952h9.244zM24 2L9.264 22H0L14.736 2H24z" fill="#8B5CF6" fillRule="evenodd" />
-  </svg>
-));
-
 const PROVIDER_ICONS = {
   Google: GoogleIcon,
   Meta: MetaIcon,
@@ -237,7 +231,6 @@ const PROVIDER_ICONS = {
   Stepfun: StepfunIcon,
   Upstage: UpstageIcon,
   'MiniMax AI': MiniMaxIcon,
-  'Z.ai': ZAIIcon,
 };
 
 function getProviderIcon(provider) {
